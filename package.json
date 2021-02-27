@@ -1,8 +1,15 @@
 {
   "name": "create-project",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "A CLI to bootstrap node-mongo @ https://github.com/code-collabo/node-mongo-cli/",
+  "main": "src/index.js",
+  "bin": {
+    "chasscepts/create-project": "bin/create-project.js",
+    "create-project": "bin/create-project.js"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -10,11 +17,21 @@
     "type": "git",
     "url": "git+https://github.com/chasscepts/create-project.git"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "cli",
+    "create-project"
+  ],
+  "author": "Obetta Francis",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/chasscepts/create-project/issues"
   },
-  "homepage": "https://github.com/chasscepts/create-project#readme"
+  "homepage": "https://github.com/chasscepts/create-project#readme",
+  "dependencies": {
+    "adm-zip": "^0.5.3",
+    "arg": "^5.0.0",
+    "chalk": "^4.1.0",
+    "esm": "^3.2.25",
+    "inquirer": "^8.0.0"
+  }
 }
