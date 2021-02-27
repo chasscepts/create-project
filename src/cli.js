@@ -1,11 +1,9 @@
 import fs from 'fs';
-import path from 'path';
 import arg from 'arg';
 import inquirer from 'inquirer';
 import chalk from 'chalk';
-import getTemplate from '../templates';
-import download from '../download';
-import unzip from '../unzip';
+import downloadRepo from 'download-git-repo';
+import getTemplate from './templates';
 
 function parseArgumentsIntoOptions(rawArgs) {
  const args = arg(
@@ -84,35 +82,44 @@ function resolveTemplate(options) {
   return getTemplate(name);
 }
 
-function randomFilename() {
-  let file = (Math.random() + 1).toString(36).substr(5);
-  while(fs.existsSync(file)) {
-    file = (Math.random() + 1).toString(36).substr(5);
-  }
-  return file;
+/**
+ * Use download-git-repo to scaffold our template
+ * @param {String} repo "github_username/repo_name"
+ * @param {String} dest Directory to extract template to. This is same as project name
+ */
+function download(repo, dest) {
+  return new Promise((resolve, reject) => {
+    try {
+      downloadRepo(`github:${repo}`, dest, {}, err => {
+        if(err){
+          reject(err);
+        }
+        else {
+          resolve(err);
+        }
+      });
+    }
+    catch(err) {
+      reject(err);
+    }
+  });
 }
 
 function scaffold(options) {
   const dir = options.name;
-  const temp = randomFilename();
+  //const temp = randomFilename();
   createProjectDir(dir);
-  resolveTemplate(options).then(url => {
-    download(url, temp);
-  }).then(() => {
-    unzip(temp, dir, true);
-    fs.unlink(temp, () => {
-      console.log('%s', chalk.green.bold(`Project ${dir} successfully created`));
+  resolveTemplate(options)
+    .then(repo => download(repo, dir))
+    .then(() => console.log('%s', chalk.green(`Project ${dir} successfully created`)))
+    .catch(err => {
+      fs.rmdirSync(dir, { recursive: true });
+      console.error(err);
     });
-  }).catch(err => {
-    fs.unlink(dir, () => {});
-    fs.unlink(temp, () => {});
-    console.error(err);
-  });
 }
 
 export async function cli(args) {
   let options = parseArgumentsIntoOptions(args);
   options = await promptForMissingOptions(options);
   scaffold(options);
-  //console.log(options);
 }
